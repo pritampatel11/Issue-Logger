@@ -6,10 +6,11 @@ from io import BytesIO
 from st_aggrid import AgGrid, GridOptionsBuilder, GridUpdateMode
 from datetime import datetime
 
-# Directory to save uploaded files
-UPLOAD_DIR = "uploads"
-if not os.path.exists(UPLOAD_DIR):
-    os.makedirs(UPLOAD_DIR)
+# Local storage directory
+LOCAL_STORAGE_DIR = r"C:\Users\patel\Downloads"
+
+if not os.path.exists(LOCAL_STORAGE_DIR):
+    os.makedirs(LOCAL_STORAGE_DIR)
 
 # Function to load existing data from the Excel file or create a new one if it doesn't exist
 def load_data(file_path):
@@ -33,14 +34,10 @@ def append_data(file_path, new_data):
         data = new_data
     data.to_excel(file_path, index=False, engine='openpyxl')
 
-# Function to save the entire data to the Excel file
-def save_data(file_path, data):
-    data.to_excel(file_path, index=False, engine='openpyxl')
-
-# Function to save uploaded files and return their paths
-def save_uploaded_files(uploaded_files, ship_name, issue_logged_date):
+# Function to save uploaded files locally and return their paths
+def save_uploaded_files_locally(uploaded_files, ship_name, issue_logged_date):
     saved_files = []
-    subfolder = os.path.join(UPLOAD_DIR, f"{ship_name}_{issue_logged_date}")
+    subfolder = os.path.join(LOCAL_STORAGE_DIR, f"{ship_name}_{issue_logged_date}")
     if not os.path.exists(subfolder):
         os.makedirs(subfolder)
     for uploaded_file in uploaded_files:
@@ -63,8 +60,8 @@ file_path = "test.xlsx"
 data = load_data(file_path)
 
 # Streamlit UI
-st.set_page_config(page_title="Technical Issue Logger", page_icon="🛠️", layout="wide")
-st.title("🛠️Technical Issue Logger")
+st.set_page_config(page_title="Technical Issue Logger", page_icon="📝", layout="wide")
+st.title("Technical Issue Logger")
 
 # Sidebar for filters and download button
 st.sidebar.header("Filters")
@@ -136,7 +133,7 @@ uploaded_files = st.file_uploader("Attach files", type=["pdf", "png", "jpg", "jp
 
 if st.button("Submit"):
     issue_logged_date_str = issue_logged_date.strftime("%Y-%m-%d")
-    saved_files = save_uploaded_files(uploaded_files, ship_name, issue_logged_date_str)
+    saved_files = save_uploaded_files_locally(uploaded_files, ship_name, issue_logged_date_str)
     new_data = pd.DataFrame({
         "Issue Logged Date": [issue_logged_date],
         "Ship Name": [ship_name],
